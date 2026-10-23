@@ -1,17 +1,26 @@
-# profile
+# My Student Profile
 
-A new Flutter project.
+## Project Description
+My Student Profile is a Flutter application that allows students to create and display a personal academic profile.
 
-## Getting Started
+## Features
+- Student information form
+- Profile picture selection
+- Editable student details and About Me section
+- Light and dark theme toggle
+- Profile display and editing
+- Contact Me button
 
-This project is a starting point for a Flutter application.
+## Technologies Used
+- Flutter
+- Dart
+- Android Studio
 
-A few resources to get you started if this is your first Flutter project:
+## How to Run
+1. Install Flutter and set up Android Studio.
+2. Clone this repository.
+3. Run `flutter pub get`.
+4. Run `flutter run`.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Author
+Student assignment project.
