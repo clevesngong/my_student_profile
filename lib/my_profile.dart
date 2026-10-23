@@ -1,5 +1,8 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class StudentProfile extends StatefulWidget {
   const StudentProfile({super.key});
@@ -20,11 +23,37 @@ class _StudentProfileState extends State<StudentProfile> {
   final aboutController = TextEditingController(
     text: 'I am a passionate student who enjoys learning new skills, '
         'exploring technology, and solving problems. I am committed '
-        'to improving myself and building a successful future.',
+        'to personal growth and building a successful future.',
   );
 
+  final ImagePicker _picker = ImagePicker();
+
+  File? _profileImage;
   bool showProfile = false;
   bool isDarkMode = false;
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+
+      if (image != null && mounted) {
+        setState(() {
+          _profileImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not select the image. Please try again.'),
+        ),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -49,6 +78,11 @@ class _StudentProfileState extends State<StudentProfile> {
       child: TextField(
         controller: controller,
         maxLines: label == 'About Me' ? 3 : 1,
+        keyboardType: label == 'Email'
+            ? TextInputType.emailAddress
+            : label == 'Phone'
+            ? TextInputType.phone
+            : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),
@@ -59,6 +93,17 @@ class _StudentProfileState extends State<StudentProfile> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget profilePicture(double radius) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Colors.blue.shade100,
+      backgroundImage: _profileImage != null
+          ? FileImage(_profileImage!)
+          : const AssetImage('assets/vv.jpg') as ImageProvider,
+      child: null,
     );
   }
 
@@ -77,7 +122,9 @@ class _StudentProfileState extends State<StudentProfile> {
   void saveProfile() {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your name.')),
+        const SnackBar(
+          content: Text('Please enter your name.'),
+        ),
       );
       return;
     }
@@ -138,11 +185,15 @@ class _StudentProfileState extends State<StudentProfile> {
                     ),
                     const SizedBox(height: 20),
 
-                    const CircleAvatar(
-                      radius: 55,
-                      backgroundImage: AssetImage('assets/vv.jpg'),
+                    Center(child: profilePicture(60)),
+
+                    TextButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Choose Profile Picture'),
                     ),
-                    const SizedBox(height: 20),
+
+                    const SizedBox(height: 12),
 
                     inputField(
                       'Full Name',
@@ -184,6 +235,7 @@ class _StudentProfileState extends State<StudentProfile> {
                       Icons.info_outline,
                       aboutController,
                     ),
+
                     const SizedBox(height: 12),
 
                     ElevatedButton(
@@ -191,13 +243,18 @@ class _StudentProfileState extends State<StudentProfile> {
                       child: const Text('Save Profile'),
                     ),
                   ] else ...[
-                    const Center(
-                      child: CircleAvatar(
-                        radius: 65,
-                        backgroundImage: AssetImage('assets/vv.jpg'),
+                    Center(child: profilePicture(70)),
+                    const SizedBox(height: 8),
+
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Change Picture'),
                       ),
                     ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 8),
 
                     Text(
                       nameController.text.trim(),
@@ -207,6 +264,7 @@ class _StudentProfileState extends State<StudentProfile> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
                     const SizedBox(height: 6),
 
                     Text(
@@ -217,10 +275,12 @@ class _StudentProfileState extends State<StudentProfile> {
                         color: Colors.blue,
                       ),
                     ),
+
                     Text(
                       universityController.text.trim(),
                       textAlign: TextAlign.center,
                     ),
+
                     const SizedBox(height: 20),
 
                     infoCard(
@@ -245,6 +305,7 @@ class _StudentProfileState extends State<StudentProfile> {
                     ),
 
                     const SizedBox(height: 16),
+
                     const Text(
                       'About Me',
                       style: TextStyle(
@@ -252,6 +313,7 @@ class _StudentProfileState extends State<StudentProfile> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
                     const SizedBox(height: 8),
 
                     Card(
@@ -270,6 +332,7 @@ class _StudentProfileState extends State<StudentProfile> {
                     ),
 
                     const SizedBox(height: 16),
+
                     ElevatedButton.icon(
                       onPressed: () {
                         setState(() {
@@ -279,6 +342,7 @@ class _StudentProfileState extends State<StudentProfile> {
                       icon: const Icon(Icons.edit),
                       label: const Text('Edit Profile'),
                     ),
+
                     const SizedBox(height: 8),
 
                     ElevatedButton(
