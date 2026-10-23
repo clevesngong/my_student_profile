@@ -12,355 +12,592 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-  final nameController = TextEditingController();
-  final courseController = TextEditingController();
-  final universityController = TextEditingController();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
-  final locationController = TextEditingController();
-  final levelController = TextEditingController();
-
-  final aboutController = TextEditingController(
-    text: 'I am a passionate student who enjoys learning new skills, '
-        'exploring technology, and solving problems. I am committed '
-        'to personal growth and building a successful future.',
-  );
+  // Light mode is enabled when the app first opens.
+  bool isDarkMode = false;
+  bool isSaved = false;
 
   final ImagePicker _picker = ImagePicker();
-
   File? _profileImage;
-  bool showProfile = false;
-  bool isDarkMode = false;
 
-  Future<void> _pickImage() async {
+  final TextEditingController _nameController =
+  TextEditingController();
+  final TextEditingController _courseController =
+  TextEditingController();
+  final TextEditingController _schoolController =
+  TextEditingController();
+  final TextEditingController _emailController =
+  TextEditingController();
+  final TextEditingController _phoneController =
+  TextEditingController();
+  final TextEditingController _locationController =
+  TextEditingController();
+  final TextEditingController _levelController =
+  TextEditingController();
+  final TextEditingController _aboutController =
+  TextEditingController(
+    text:
+    'I am a motivated student who enjoys learning, '
+        'developing new skills, and working with others.',
+  );
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _courseController.dispose();
+    _schoolController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _locationController.dispose();
+    _levelController.dispose();
+    _aboutController.dispose();
+    super.dispose();
+  }
+
+  void _toggleTheme() {
+    setState(() {
+      isDarkMode = !isDarkMode;
+    });
+  }
+
+  Future<void> _pickProfilePicture() async {
     try {
-      final XFile? image = await _picker.pickImage(
+      final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
       );
 
-      if (image != null && mounted) {
+      if (pickedFile != null && mounted) {
         setState(() {
-          _profileImage = File(image.path);
+          _profileImage = File(pickedFile.path);
         });
       }
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not select the image. Please try again.'),
+        SnackBar(
+          content: Text('Could not select image: $e'),
         ),
       );
     }
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    courseController.dispose();
-    universityController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    locationController.dispose();
-    levelController.dispose();
-    aboutController.dispose();
-    super.dispose();
-  }
-
-  Widget inputField(
-      String label,
-      IconData icon,
-      TextEditingController controller,
-      ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: TextField(
-        controller: controller,
-        maxLines: label == 'About Me' ? 3 : 1,
-        keyboardType: label == 'Email'
-            ? TextInputType.emailAddress
-            : label == 'Phone'
-            ? TextInputType.phone
-            : TextInputType.text,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 12,
-            horizontal: 12,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget profilePicture(double radius) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: Colors.blue.shade100,
-      backgroundImage: _profileImage != null
-          ? FileImage(_profileImage!)
-          : const AssetImage('assets/vv.jpg') as ImageProvider,
-      child: null,
-    );
-  }
-
-  Widget infoCard(String title, String value, IconData icon) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, color: Colors.blue),
-        title: Text(title),
-        subtitle: Text(
-          value.trim().isEmpty ? 'Not provided' : value.trim(),
-        ),
-      ),
-    );
-  }
-
-  void saveProfile() {
-    if (nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your name.'),
-        ),
-      );
-      return;
-    }
+  void _saveProfile() {
+    FocusScope.of(context).unfocus();
 
     setState(() {
-      showProfile = true;
+      isSaved = true;
     });
+  }
+
+  void _editProfile() {
+    setState(() {
+      isSaved = false;
+    });
+  }
+
+  void _contactMe() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Contact button pressed!'),
+      ),
+    );
+  }
+
+  ImageProvider<Object> _getProfileImage() {
+    if (_profileImage != null) {
+      return FileImage(_profileImage!);
+    }
+
+    return const AssetImage('assets/vv.jpg');
   }
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData lightTheme = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.blue,
+        brightness: Brightness.light,
+      ),
+      scaffoldBackgroundColor: const Color(0xFFF4F7FC),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF172554),
+        elevation: 0,
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFFF7F9FD),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFFE1E7F0),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+
+    final ThemeData darkTheme = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121722),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1B2230),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: const Color(0xFF1B2230),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF252E3D),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFF394457),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.lightBlueAccent,
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness:
-          isDarkMode ? Brightness.dark : Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('My Student Profile'),
-          centerTitle: true,
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          actions: [
-            IconButton(
-              tooltip: isDarkMode ? 'Light Mode' : 'Dark Mode',
-              icon: Icon(
-                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+      title: 'My Student Profile',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                'My Student Profile',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              onPressed: () {
-                setState(() {
-                  isDarkMode = !isDarkMode;
-                });
-              },
+              actions: [
+                IconButton(
+                  tooltip: isDarkMode
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode',
+                  onPressed: _toggleTheme,
+                  icon: Icon(
+                    isDarkMode
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+            body: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 480,
+                  ),
+                  child: isSaved
+                      ? _buildProfileView(context)
+                      : _buildProfileForm(context),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileForm(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            'Create Your Profile',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Enter your details to introduce yourself.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          _buildPhotoPicker(context),
+          const SizedBox(height: 24),
+          _buildSectionCard(
+            context,
+            title: 'Personal Information',
+            icon: Icons.person_outline,
+            children: [
+              _buildTextField(
+                controller: _nameController,
+                label: 'Full Name',
+                icon: Icons.badge_outlined,
+              ),
+              _buildTextField(
+                controller: _courseController,
+                label: 'Course / Programme',
+                icon: Icons.menu_book_outlined,
+              ),
+              _buildTextField(
+                controller: _schoolController,
+                label: 'School / University',
+                icon: Icons.school_outlined,
+              ),
+              _buildTextField(
+                controller: _emailController,
+                label: 'Email Address',
+                icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              _buildTextField(
+                controller: _phoneController,
+                label: 'Phone Number',
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+              ),
+              _buildTextField(
+                controller: _locationController,
+                label: 'Location',
+                icon: Icons.location_on_outlined,
+              ),
+              _buildTextField(
+                controller: _levelController,
+                label: 'Level / Year of Study',
+                icon: Icons.school,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildSectionCard(
+            context,
+            title: 'About Me',
+            icon: Icons.edit_note,
+            children: [
+              TextField(
+                controller: _aboutController,
+                minLines: 4,
+                maxLines: 6,
+                textCapitalization:
+                TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  hintText: 'Write a little about yourself...',
+                  alignLabelWithHint: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: _saveProfile,
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save Profile'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Use the sun/moon icon above to change the theme.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotoPicker(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 58,
+          backgroundColor:
+          Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundImage: _getProfileImage(),
+          onBackgroundImageError: (_, __) {},
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _pickProfilePicture,
+          icon: const Icon(Icons.photo_library_outlined),
+          label: const Text('Choose Profile Picture'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionCard(
+      BuildContext context, {
+        required String title,
+        required IconData icon,
+        required List<Widget> children,
+      }) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            ...children.map(
+                  (child) => Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: child,
+              ),
             ),
           ],
         ),
-        body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+    );
+  }
+
+  Widget _buildProfileView(BuildContext context) {
+    final String name = _nameController.text.trim();
+    final String displayName =
+    name.isEmpty ? 'Student Name' : name;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (!showProfile) ...[
-                    const Text(
-                      'Create Your Profile',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Center(child: profilePicture(60)),
-
-                    TextButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Choose Profile Picture'),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    inputField(
-                      'Full Name',
-                      Icons.person,
-                      nameController,
-                    ),
-                    inputField(
-                      'Course',
-                      Icons.menu_book,
-                      courseController,
-                    ),
-                    inputField(
-                      'School / University',
-                      Icons.school,
-                      universityController,
-                    ),
-                    inputField(
-                      'Email',
-                      Icons.email,
-                      emailController,
-                    ),
-                    inputField(
-                      'Phone',
-                      Icons.phone,
-                      phoneController,
-                    ),
-                    inputField(
-                      'Location',
-                      Icons.location_on,
-                      locationController,
-                    ),
-                    inputField(
-                      'Level',
-                      Icons.grade,
-                      levelController,
-                    ),
-                    inputField(
-                      'About Me',
-                      Icons.info_outline,
-                      aboutController,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    ElevatedButton(
-                      onPressed: saveProfile,
-                      child: const Text('Save Profile'),
-                    ),
-                  ] else ...[
-                    Center(child: profilePicture(70)),
-                    const SizedBox(height: 8),
-
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: _pickImage,
-                        icon: const Icon(Icons.photo_library),
-                        label: const Text('Change Picture'),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      nameController.text.trim(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 27,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
+                  CircleAvatar(
+                    radius: 62,
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest,
+                    backgroundImage: _getProfileImage(),
+                    onBackgroundImageError: (_, __) {},
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    displayName,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _courseController.text.trim().isEmpty
+                        ? 'Student'
+                        : _courseController.text.trim(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  if (_schoolController.text.trim().isNotEmpty) ...[
                     const SizedBox(height: 6),
-
                     Text(
-                      courseController.text.trim(),
+                      _schoolController.text.trim(),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.blue,
-                      ),
-                    ),
-
-                    Text(
-                      universityController.text.trim(),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    infoCard(
-                      'Email',
-                      emailController.text,
-                      Icons.email,
-                    ),
-                    infoCard(
-                      'Phone',
-                      phoneController.text,
-                      Icons.phone,
-                    ),
-                    infoCard(
-                      'Location',
-                      locationController.text,
-                      Icons.location_on,
-                    ),
-                    infoCard(
-                      'Level',
-                      levelController.text,
-                      Icons.school,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    const Text(
-                      'About Me',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          aboutController.text.trim().isEmpty
-                              ? 'No introduction provided yet.'
-                              : aboutController.text.trim(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          showProfile = false;
-                        });
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Edit Profile'),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Contact button pressed!'),
-                          ),
-                        );
-                      },
-                      child: const Text('Contact Me'),
                     ),
                   ],
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: _contactMe,
+                    icon: const Icon(Icons.mail_outline),
+                    label: const Text('Contact Me'),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
+          const SizedBox(height: 16),
+          _buildSectionCard(
+            context,
+            title: 'Student Details',
+            icon: Icons.person_outline,
+            children: [
+              _buildDetail(
+                context,
+                Icons.email_outlined,
+                'Email',
+                _emailController.text,
+              ),
+              _buildDetail(
+                context,
+                Icons.phone_outlined,
+                'Phone',
+                _phoneController.text,
+              ),
+              _buildDetail(
+                context,
+                Icons.location_on_outlined,
+                'Location',
+                _locationController.text,
+              ),
+              _buildDetail(
+                context,
+                Icons.school_outlined,
+                'Level / Year',
+                _levelController.text,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildSectionCard(
+            context,
+            title: 'About Me',
+            icon: Icons.info_outline,
+            children: [
+              Text(
+                _aboutController.text.trim().isEmpty
+                    ? 'No description added yet.'
+                    : _aboutController.text.trim(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: _editProfile,
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('Edit Profile'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetail(
+      BuildContext context,
+      IconData icon,
+      String label,
+      String value,
+      ) {
+    if (value.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  value.trim(),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
