@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:profile/student_profile.dart';
-
+import 'my_profile.dart';
 
 void main() {
   runApp(const MyStudentProfileApp());
